@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Running build automation'
+                echo 'Running build automation...'
                 sh './gradlew build --no-daemon'
                 archiveArtifacts artifacts: 'dist/trainSchedule.zip'
             }
@@ -13,6 +13,7 @@ pipeline {
                 branch 'master'
             }
             steps {
+		echo ' Running in staging system'
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     sshPublisher(
                         failOnError: true,
@@ -45,6 +46,7 @@ pipeline {
             steps {
                 input 'Does the staging environment look OK?'
                 milestone(1)
+		echo 'Running on production system'
                 withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     sshPublisher(
                         failOnError: true,
